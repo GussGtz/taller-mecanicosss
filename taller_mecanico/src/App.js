@@ -10,6 +10,7 @@ import Seguimiento from './page/Seguimiento';
 import Trabajos from './page/Trabajos';
 import ActualizarTrabajo from './page/ActualizarTrabajo';
 import ACTrabajos from './page/ACTrabajos';
+import Piezas from './page/Piezas'; // Importa el componente ConsultarPiezas
 
 const App = () => {
   const handleLogin = (userData) => {
@@ -29,13 +30,12 @@ const App = () => {
           <Route path="/register" element={<Register onRegister={handleRegister} />} />
           <Route path="/job-form" element={<JobForm />} />
           <Route path="/consultartrabajos" element={<ConsultarTrabajos />} />
+          <Route path="/Piezas" element={<Piezas />} /> {/* Agrega la ruta para ConsultarPiezas */}
           <Route path="/detalles/:id" element={<Detalles />} />
           <Route path="/seguimiento" element={<Seguimiento />} />
           <Route path="/trabajos" element={<Trabajos />} />
           <Route path="/ActualizarTrabajo" element={<ActualizarTrabajo />} />
           <Route path="/ACTrabajos" element={<ACTrabajos />} />
-
-
         </Routes>
       </div>
     </Router>
