@@ -19,12 +19,20 @@ const ConsultarTrabajos = () => {
     tipo_de_trabajo: '',
     estado: 'Inactivo',
     horas: 0,
+    piezas: [], // Lista de piezas seleccionadas para el trabajo
     // Otros campos según tu modelo de datos
   });
-
+  
+  const [piezasDisponibles, setPiezasDisponibles] = useState([]); // Estado para almacenar las piezas disponibles
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Obtener las piezas disponibles al cargar el componente
+    axios.get('http://localhost:4001/api/piezas')
+      .then(response => setPiezasDisponibles(response.data))
+      .catch(error => console.error('Error fetching piezas:', error));
+    
+    // Obtener los trabajos al cargar el componente
     axios.get('http://localhost:4001/api/trabajos')
       .then(response => setJobs(response.data))
       .catch(error => console.error('Error fetching jobs:', error));
@@ -39,13 +47,14 @@ const ConsultarTrabajos = () => {
         <td>{job.horas}</td>
         <td>{job.estado}</td>
         <td>{job.tipo_de_trabajo}</td>
-        <td>{job.horas * 350}</td> {/* Calcular el precio basado en las horas */}
+        <td>{job.horas * 350}</td>
         <td>
           <button onClick={() => navigate(`/detalles/${job.id_trabajo}`)}>Ver detalles</button>
         </td>
       </tr>
     ));
   };
+  
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -60,15 +69,25 @@ const ConsultarTrabajos = () => {
     setNewJob(prevState => ({ ...prevState, [name]: value }));
   };
 
+  const handlePiezasChange = (e) => {
+    const selectedPiezas = Array.from(e.target.selectedOptions, option => option.value);
+    setNewJob(prevState => ({ ...prevState, piezas: selectedPiezas }));
+  };
   const agregarTrabajo = async () => {
+    // Verificar si todos los campos obligatorios están llenos
+    if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas <= 0) {
+      alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
+      return;
+    }
+  
     try {
       // Calcular el precio automáticamente multiplicando el número de horas por $350
       const costo = newJob.horas * 350;
-
+  
       const response = await axios.post('http://localhost:4001/api/trabajos', { ...newJob, costo });
       setJobs([...jobs, response.data]);
       setModalIsOpen(false);
-
+  
       setNewJob({
         id_mecanico: 1,
         id_cliente: 1,
@@ -84,7 +103,7 @@ const ConsultarTrabajos = () => {
       console.error('Error al agregar trabajo:', error);
     }
   };
-
+  
   return (
     <div className="container">
       <Header />
@@ -130,7 +149,19 @@ const ConsultarTrabajos = () => {
             <label htmlFor="estado">Estado:</label>
             <input type="text" id="estado" name="estado" onChange={handleInputChange} value={newJob.estado} />
           </div>
-          {/* No se incluye campo para el precio */}
+          <div className="input-group">
+            <label htmlFor="piezas">Piezas:</label>
+            <select
+              id="piezas"
+              name="piezas"
+              onChange={handlePiezasChange}
+              multiple
+            >
+              {piezasDisponibles.map(pieza => (
+                <option key={pieza.id_pieza} value={pieza.id_pieza}>{pieza.nombre}</option>
+              ))}
+            </select>
+          </div>
           <div className="button-group">
             <button type="button" onClick={agregarTrabajo}>Aplicar</button>
             <button type="button" onClick={closeModal}>Cancelar</button>
