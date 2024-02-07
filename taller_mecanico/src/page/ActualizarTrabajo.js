@@ -1,40 +1,54 @@
-import React, { useState } from 'react';
-import Header from '../components/Header'; // Asegúrate de que la ruta al componente Header sea la correcta
-import '../css/ActualizarTrabajo.css'; // Asegúrate de que la ruta al archivo CSS sea correcta
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Header from '../components/Header';
+import '../css/ActualizarTrabajo.css';
 
 const ActualizarTrabajo = () => {
   const [idTrabajo, setIdTrabajo] = useState('');
+  const [job, setJob] = useState(null);
+  const [modalAumentarHorasOpen, setModalAumentarHorasOpen] = useState(false);
+  const [horasAumentadas, setHorasAumentadas] = useState(0);
+
+  useEffect(() => {
+    if (idTrabajo) {
+      axios.get(`http://localhost:4001/api/trabajos/${idTrabajo}`)
+        .then(response => setJob(response.data))
+        .catch(error => console.error('Error fetching job details:', error));
+    }
+  }, [idTrabajo]);
 
   const handleIdChange = (e) => {
     setIdTrabajo(e.target.value);
   };
 
   const handleAumentarHoras = () => {
-    console.log('Aumentando horas para el trabajo ID:', idTrabajo);
-    // Aquí iría la lógica para aumentar horas, como una petición a tu API
+    setModalAumentarHorasOpen(true);
   };
 
-  const handleAumentarCostoPiezas = () => {
-    console.log('Aumentando costo de piezas para el trabajo ID:', idTrabajo);
-    // Aquí iría la lógica para aumentar el costo de piezas
-  };
-
-  const handleFinalizarTrabajo = () => {
-    console.log('Finalizando el trabajo ID:', idTrabajo);
-    // Aquí iría la lógica para finalizar el trabajo
+  const handleConfirmAumentarHoras = async () => {
+    try {
+      const response = await axios.post(`http://localhost:4001/api/trabajos/${idTrabajo}/aumentar-horas`, { horas: horasAumentadas });
+      setJob(response.data); // Actualizar el estado local con los datos actualizados del trabajo
+      setHorasAumentadas(0); // Reiniciar las horas aumentadas
+      setModalAumentarHorasOpen(false); // Cerrar el modal
+    } catch (error) {
+      console.error('Error al aumentar horas:', error);
+    }
   };
 
   const handleCancelar = () => {
-    setIdTrabajo(''); // Resetear el ID del trabajo
+    setIdTrabajo('');
+    setJob(null);
+    setModalAumentarHorasOpen(false);
+    setHorasAumentadas(0);
     console.log('Operación cancelada');
-    // Aquí iría cualquier otra lógica de limpieza o navegación
   };
 
   return (
     <>
-      <Header /> {/* Encabezado añadido */}
+      <Header />
       <div className="actualizar-trabajo">
-        <h1>Actualizar Trabajo</h1> {/* Título colocado fuera del formulario */}
+        <h1>Actualizar Trabajo</h1>
         <form>
           <div className="input-container">
             <label htmlFor="idTrabajo">Id del trabajo a actualizar</label>
@@ -48,12 +62,43 @@ const ActualizarTrabajo = () => {
           </div>
           <div className="button-container">
             <button type="button" onClick={handleAumentarHoras}>Aumentar horas</button>
-            <button type="button" onClick={handleAumentarCostoPiezas}>Aumentar costo de piezas</button>
-            <button type="button" onClick={handleFinalizarTrabajo}>Finalizar Trabajo</button>
+            {/* Otros botones para otras acciones de actualización */}
             <button type="button" onClick={handleCancelar} className="cancelar">Cancelar</button>
           </div>
         </form>
+        {job && (
+          <div className="job-details">
+            <h2>Detalles del Trabajo</h2>
+            <p>ID: {job.id}</p>
+            <p>Descripción: {job.descripcion}</p>
+            <p>Horas trabajadas: {job.horas}</p>
+            {/* Otros detalles del trabajo */}
+            <div className="edit-hours">
+              <label htmlFor="horasAumentadas">Aumentar horas:</label>
+              <input
+                id="horasAumentadas"
+                type="number"
+                value={horasAumentadas}
+                onChange={(e) => setHorasAumentadas(parseInt(e.target.value))}
+              />
+              <button type="button" onClick={handleConfirmAumentarHoras}>Confirmar</button>
+            </div>
+          </div>
+        )}
       </div>
+      {/* Modal para confirmar el aumento de horas */}
+      {modalAumentarHorasOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Confirmar Aumento de Horas</h2>
+            <p>¿Está seguro de que desea aumentar las horas para el trabajo ID: {idTrabajo}?</p>
+            <div className="button-container">
+              <button type="button" onClick={handleConfirmAumentarHoras}>Confirmar</button>
+              <button type="button" onClick={() => setModalAumentarHorasOpen(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
