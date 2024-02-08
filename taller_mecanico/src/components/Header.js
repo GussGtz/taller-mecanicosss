@@ -16,14 +16,10 @@ const Header = () => {
         <img src={logoUrl} alt="Mechaniix Pro" className="header-logo" />
       </Link>
       <div className="header-buttons">
-        <Link to="/ConsultarTrabajos" className="header-button">Consultar trabajo</Link>
+      <Link to="/ConsultarTrabajos" className="header-button">Consultar trabajo</Link>
+      <Link to="/Piezas" className="header-button">Piezas</Link>
         <Link to="/Home" className="header-button">Home</Link>
-        <Link to="/Seguimiento" className="header-button">Seguimiento</Link>
-        <Link to="/Trabajos" className="header-button">Trabajos</Link>
-        <Link to="/job-form" className="header-button">registrar trabajo</Link>
-        <Link to="/ActualizarTrabajo" className="header-button">Actualizar</Link>
-        <Link to="/ACTrabajos" className="header-button">ACTrabajos</Link>
-
+  
 
 
       </div>

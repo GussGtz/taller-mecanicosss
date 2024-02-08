@@ -10,6 +10,7 @@ Modal.setAppElement('#root');
 const ConsultarTrabajos = () => {
   const [jobs, setJobs] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null); // Estado para almacenar el trabajo seleccionado para actualizar
   const [newJob, setNewJob] = useState({
     id_mecanico: 1,
     id_cliente: 1,
@@ -23,7 +24,7 @@ const ConsultarTrabajos = () => {
     // Otros campos según tu modelo de datos
   });
   
-  const [piezasDisponibles, setPiezasDisponibles] = useState([]); // Estado para almacenar las piezas disponibles
+  const [piezasDisponibles, setPiezasDisponibles] = useState([]); // Estado para almacenar las piezas disponibles y su precio
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,19 +50,51 @@ const ConsultarTrabajos = () => {
         <td>{job.tipo_de_trabajo}</td>
         <td>{job.horas * 350}</td>
         <td>
-          <button onClick={() => navigate(`/detalles/${job.id_trabajo}`)}>Ver detalles</button>
+          <button onClick={() => handleDetails(job)}>Detalles</button>
+          <button onClick={() => handleUpdate(job)}>Actualizar</button>
+          <button onClick={() => handleDelete(job.id_trabajo)}>Eliminar</button>
         </td>
       </tr>
     ));
   };
-  
 
-  const openModal = () => {
+  const handleDetails = (job) => {
+    // Aquí puedes implementar la lógica para mostrar los detalles del trabajo seleccionado
+  };
+
+  const handleUpdate = (job) => {
+    setSelectedJob(job);
+    setNewJob(job); // Establecer el trabajo seleccionado como el nuevo trabajo para editar
     setModalIsOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("¿Estás seguro de eliminar este trabajo?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:4001/api/trabajos/${id}`);
+      setJobs(jobs.filter(job => job.id_trabajo !== id));
+    } catch (error) {
+      console.error('Error deleting job:', error);
+    }
   };
 
   const closeModal = () => {
     setModalIsOpen(false);
+    setSelectedJob(null);
+    setNewJob({
+      id_mecanico: 1,
+      id_cliente: 1,
+      fecha: '',
+      nombre: '',
+      descripcion: '',
+      tipo_de_trabajo: '',
+      estado: 'Inactivo',
+      horas: 0,
+      piezas: [],
+      // Otros campos según tu modelo de datos
+    });
   };
 
   const handleInputChange = (e) => {
@@ -70,9 +103,18 @@ const ConsultarTrabajos = () => {
   };
 
   const handlePiezasChange = (e) => {
-    const selectedPiezas = Array.from(e.target.selectedOptions, option => option.value);
-    setNewJob(prevState => ({ ...prevState, piezas: selectedPiezas }));
+    const selectedPiezas = Array.from(e.target.selectedOptions, option => ({
+      id_pieza: option.value,
+      precio: parseFloat(option.dataset.precio) // Agregar el precio como un atributo de datos en el option
+    }));
+    setNewJob(prevState => ({
+      ...prevState,
+      piezas: selectedPiezas.map(pieza => pieza.id_pieza) // Solo guardar los IDs de las piezas en el trabajo
+    }));
   };
+
+  
+
   const agregarTrabajo = async () => {
     // Verificar si todos los campos obligatorios están llenos
     if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas <= 0) {
@@ -81,93 +123,95 @@ const ConsultarTrabajos = () => {
     }
   
     try {
-      // Calcular el precio automáticamente multiplicando el número de horas por $350
-      const costo = newJob.horas * 350;
+      // Calcular el precio automáticamente multiplicando el número de horas por $350 y sumar el precio de las piezas
+      const costoPorHoras = newJob.horas * 350;
+      const costoPiezas = newJob.piezas.reduce((total, pieza) => total + pieza.precio, 0);
+      const costoTotal = costoPorHoras + costoPiezas;
   
-      const response = await axios.post('http://localhost:4001/api/trabajos', { ...newJob, costo });
-      setJobs([...jobs, response.data]);
-      setModalIsOpen(false);
+      if (selectedJob) {
+        await axios.put(`http://localhost:4001/api/trabajos/${selectedJob.id_trabajo}`, { ...newJob, costo: costoTotal });
+        const updatedJobs = jobs.map(job => {
+          if (job.id_trabajo === selectedJob.id_trabajo) {
+            return { ...newJob, costo: costoTotal };
+          }
+          return job;
+        });
+        setJobs(updatedJobs);
+      } else {
+        const response = await axios.post('http://localhost:4001/api/trabajos', { ...newJob, costo: costoTotal });
+        setJobs([...jobs, { ...response.data, costo: costoTotal }]);
+      }
   
-      setNewJob({
-        id_mecanico: 1,
-        id_cliente: 1,
-        fecha: '',
-        nombre: '',
-        descripcion: '',
-        tipo_de_trabajo: '',
-        estado: 'Inactivo',
-        horas: 0,
-        // Otros campos según tu modelo de datos
-      });
+      closeModal();
     } catch (error) {
-      console.error('Error al agregar trabajo:', error);
+      console.error('Error adding/updating job:', error);
     }
   };
   
+
   return (
     <div className="container">
       <Header />
       <h1>Consultar y actualizar trabajos</h1>
       <h2>Consultar y actualizar trabajos</h2>
-      <button onClick={openModal}>Agregar Trabajo</button>
-
+      <button onClick={() => setModalIsOpen(true)}>Agregar Trabajo</button>
       <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Agregar Trabajo"
-        className="modal"
-        overlayClassName="overlay"
+  isOpen={modalIsOpen}
+  onRequestClose={closeModal}
+  contentLabel={selectedJob ? "Actualizar Trabajo" : "Agregar Trabajo"}
+  className="modal"
+  overlayClassName="overlay"
+>
+  <h2>{selectedJob ? 'Actualizar Trabajo' : 'Agregar Trabajo'}</h2>
+  <form>
+    <div className="input-group">
+      <label htmlFor="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" onChange={handleInputChange} value={newJob.nombre} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="descripcion">Descripción:</label>
+      <input type="text" id="descripcion" name="descripcion" onChange={handleInputChange} value={newJob.descripcion} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="tipo_de_trabajo">Tipo de Trabajo:</label>
+      <select
+        id="tipo_de_trabajo"
+        name="tipo_de_trabajo"
+        onChange={handleInputChange}
+        value={newJob.tipo_de_trabajo || ''}
       >
-        <h2>Agregar Trabajo</h2>
-        <form>
-          <div className="input-group">
-            <label htmlFor="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" onChange={handleInputChange} value={newJob.nombre} />
-          </div>
-          <div className="input-group">
-            <label htmlFor="descripcion">Descripción:</label>
-            <input type="text" id="descripcion" name="descripcion" onChange={handleInputChange} value={newJob.descripcion} />
-          </div>
-          <div className="input-group">
-            <label htmlFor="tipo_de_trabajo">Tipo de Trabajo:</label>
-            <select
-              id="tipo_de_trabajo"
-              name="tipo_de_trabajo"
-              onChange={handleInputChange}
-              value={newJob.tipo_de_trabajo || ''}
-            >
-              <option value="">Seleccionar Tipo</option>
-              <option value="Reparación">Reparación</option>
-              <option value="Revisión">Revisión</option>
-            </select>
-          </div>
-          <div className="input-group">
-            <label htmlFor="horas">Horas:</label>
-            <input type="number" id="horas" name="horas" onChange={handleInputChange} value={newJob.horas} />
-          </div>
-          <div className="input-group">
-            <label htmlFor="estado">Estado:</label>
-            <input type="text" id="estado" name="estado" onChange={handleInputChange} value={newJob.estado} />
-          </div>
-          <div className="input-group">
-            <label htmlFor="piezas">Piezas:</label>
-            <select
-              id="piezas"
-              name="piezas"
-              onChange={handlePiezasChange}
-              multiple
-            >
-              {piezasDisponibles.map(pieza => (
-                <option key={pieza.id_pieza} value={pieza.id_pieza}>{pieza.nombre}</option>
-              ))}
-            </select>
-          </div>
-          <div className="button-group">
-            <button type="button" onClick={agregarTrabajo}>Aplicar</button>
-            <button type="button" onClick={closeModal}>Cancelar</button>
-          </div>
-        </form>
-      </Modal>
+        <option value="">Seleccionar Tipo</option>
+        <option value="Reparación">Reparación</option>
+        <option value="Revisión">Revisión</option>
+      </select>
+    </div>
+    <div className="input-group">
+      <label htmlFor="horas">Horas:</label>
+      <input type="number" id="horas" name="horas" onChange={handleInputChange} value={newJob.horas} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="estado">Estado:</label>
+      <input type="text" id="estado" name="estado" onChange={handleInputChange} value={newJob.estado} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="piezas">Piezas:</label>
+      <select
+        id="piezas"
+        name="piezas"
+        onChange={handlePiezasChange}
+        multiple
+      >
+        {piezasDisponibles.map(pieza => (
+          <option key={pieza.id_pieza} value={pieza.id_pieza} data-precio={pieza.precio}>{pieza.nombre}</option>
+        ))}
+      </select>
+    </div>
+    <div className="button-group">
+      <button type="button" onClick={agregarTrabajo}>{selectedJob ? 'Actualizar' : 'Agregar'}</button>
+      <button type="button" onClick={closeModal}>Cancelar</button>
+    </div>
+  </form>
+</Modal>
 
       <table>
         <thead>
@@ -179,7 +223,7 @@ const ConsultarTrabajos = () => {
             <th>Estado</th>
             <th>Tipo</th>
             <th>Precio</th>
-            <th>Detalles</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>{displayJobs()}</tbody>
