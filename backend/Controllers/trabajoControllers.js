@@ -1,14 +1,12 @@
 const connection = require("../database");
 
-// Obtener todos los trabajos
+/// Obtener todos los trabajos
 const obtenerTrabajos = (req, res) => {
   const sql = `
-    SELECT t.*, m.nombre AS nombre_mecanico, c.nombre AS nombre_cliente, p.nombre AS nombre_pieza
+    SELECT t.*, m.nombre AS nombre_mecanico, c.nombre AS nombre_cliente
     FROM trabajo t
     INNER JOIN mecanico m ON t.id_mecanico = m.id_mecanico
     INNER JOIN cliente c ON t.id_cliente = c.id_cliente
-    LEFT JOIN trabajo_pieza tp ON t.id_trabajo = tp.id_trabajo
-    LEFT JOIN pieza p ON tp.id_pieza = p.id_pieza
   `;
 
   connection.query(sql, (error, results) => {
@@ -25,12 +23,10 @@ const obtenerTrabajoPorId = (req, res) => {
   const id = req.params.id_trabajo;
 
   const sql = `
-    SELECT t.*, m.nombre AS nombre_mecanico, c.nombre AS nombre_cliente, p.nombre AS nombre_pieza
+    SELECT t.*, m.nombre AS nombre_mecanico, c.nombre AS nombre_cliente
     FROM trabajo t
     INNER JOIN mecanico m ON t.id_mecanico = m.id_mecanico
     INNER JOIN cliente c ON t.id_cliente = c.id_cliente
-    LEFT JOIN trabajo_pieza tp ON t.id_trabajo = tp.id_trabajo
-    LEFT JOIN pieza p ON tp.id_pieza = p.id_pieza
     WHERE t.id_trabajo = ?
   `;
 
@@ -47,11 +43,11 @@ const obtenerTrabajoPorId = (req, res) => {
 
 // Crear un nuevo trabajo
 const crearTrabajo = (req, res) => {
-  const { nombre, tipo_de_trabajo, horas, costo, estado, descripcion, id_mecanico, id_cliente, id_pieza } = req.body;
+  const { nombre, tipo_de_trabajo, horas, costo, costoPiezas, estado, descripcion, id_mecanico, id_cliente } = req.body;
 
-  const sql = "INSERT INTO trabajo (nombre, tipo_de_trabajo, horas, costo, estado, descripcion, id_mecanico, id_cliente, id_pieza) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  const sql = "INSERT INTO trabajo (nombre, tipo_de_trabajo, horas, costo, costoPiezas, estado, descripcion, id_mecanico, id_cliente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-  connection.query(sql, [nombre, tipo_de_trabajo, horas, costo, estado, descripcion, id_mecanico, id_cliente, id_pieza], (error, results) => {
+  connection.query(sql, [nombre, tipo_de_trabajo, horas, costo, costoPiezas, estado, descripcion, id_mecanico, id_cliente], (error, results) => {
     if (error) {
       res.status(500).json({ error: `Error al agregar nuevo trabajo: ${error.message}` });
     } else {
@@ -60,15 +56,14 @@ const crearTrabajo = (req, res) => {
   });
 };
 
-
 // Actualizar información de un trabajo por ID
 const actualizarTrabajoPorId = (req, res) => {
   const id = req.params.id_trabajo;
-  const { nombre, tipo_de_trabajo, horas, costo, estado, descripcion, id_mecanico, id_cliente, id_pieza } = req.body;
+  const { nombre, tipo_de_trabajo, horas, costo, costoPiezas, estado, descripcion, id_mecanico, id_cliente } = req.body;
 
-  const sql = "UPDATE trabajo SET nombre = ?, tipo_de_trabajo = ?, horas = ?, costo = ?, estado = ?, descripcion = ?, id_mecanico = ?, id_cliente = ?, id_pieza = ? WHERE id_trabajo = ?";
+  const sql = "UPDATE trabajo SET nombre = ?, tipo_de_trabajo = ?, horas = ?, costo = ?, costoPiezas = ?, estado = ?, descripcion = ?, id_mecanico = ?, id_cliente = ? WHERE id_trabajo = ?";
 
-  connection.query(sql, [nombre, tipo_de_trabajo, horas, costo, estado, descripcion, id_mecanico, id_cliente, id_pieza, id], (error, results) => {
+  connection.query(sql, [nombre, tipo_de_trabajo, horas, costo, costoPiezas, estado, descripcion, id_mecanico, id_cliente, id], (error, results) => {
     if (error) {
       res.status(500).json({ error: `Error al actualizar trabajo por ID: ${error.message}` });
     } else {

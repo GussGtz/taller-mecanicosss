@@ -10,7 +10,7 @@ Modal.setAppElement('#root');
 const ConsultarTrabajos = () => {
   const [jobs, setJobs] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null); // Estado para almacenar el trabajo seleccionado para actualizar
+  const [selectedJob, setSelectedJob] = useState(null); 
   const [newJob, setNewJob] = useState({
     id_mecanico: 1,
     id_cliente: 1,
@@ -20,27 +20,27 @@ const ConsultarTrabajos = () => {
     tipo_de_trabajo: '',
     estado: 'Inactivo',
     horas: 0,
-    piezas: [], // Lista de piezas seleccionadas para el trabajo
-    // Otros campos según tu modelo de datos
+    piezas: [], 
+    costoPieza: 0, // Nuevo campo para almacenar el costo total de las piezas
   });
   
-  const [piezasDisponibles, setPiezasDisponibles] = useState([]); // Estado para almacenar las piezas disponibles y su precio
+  const [piezasDisponibles, setPiezasDisponibles] = useState([]); 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Obtener las piezas disponibles al cargar el componente
     axios.get('http://localhost:4001/api/piezas')
       .then(response => setPiezasDisponibles(response.data))
       .catch(error => console.error('Error fetching piezas:', error));
     
-    // Obtener los trabajos al cargar el componente
     axios.get('http://localhost:4001/api/trabajos')
       .then(response => setJobs(response.data))
       .catch(error => console.error('Error fetching jobs:', error));
   }, []);
 
   const displayJobs = () => {
-    return jobs.map((job) => (
+    const sortedJobs = jobs.slice().sort((a, b) => a.id_trabajo - b.id_trabajo);
+
+    return sortedJobs.map((job) => (
       <tr key={job.id_trabajo}>
         <td>{job.id_trabajo}</td>
         <td>{job.nombre}</td>
@@ -59,12 +59,12 @@ const ConsultarTrabajos = () => {
   };
 
   const handleDetails = (job) => {
-    // Aquí puedes implementar la lógica para mostrar los detalles del trabajo seleccionado
+    // Implementa la lógica para mostrar los detalles del trabajo seleccionado
   };
 
   const handleUpdate = (job) => {
     setSelectedJob(job);
-    setNewJob(job); // Establecer el trabajo seleccionado como el nuevo trabajo para editar
+    setNewJob(job);
     setModalIsOpen(true);
   };
 
@@ -93,7 +93,7 @@ const ConsultarTrabajos = () => {
       estado: 'Inactivo',
       horas: 0,
       piezas: [],
-      // Otros campos según tu modelo de datos
+      costoPieza: 0,
     });
   };
 
@@ -105,29 +105,40 @@ const ConsultarTrabajos = () => {
   const handlePiezasChange = (e) => {
     const selectedPiezas = Array.from(e.target.selectedOptions, option => ({
       id_pieza: option.value,
-      precio: parseFloat(option.dataset.precio) // Agregar el precio como un atributo de datos en el option
+      precio: parseFloat(option.dataset.precio),
     }));
+    const costoPiezaTotal = selectedPiezas.reduce((total, pieza) => total + pieza.precio, 0);
     setNewJob(prevState => ({
       ...prevState,
-      piezas: selectedPiezas.map(pieza => pieza.id_pieza) // Solo guardar los IDs de las piezas en el trabajo
+      piezas: selectedPiezas.map(pieza => pieza.id_pieza),
+      costoPieza: costoPiezaTotal, // Actualiza el costo total de las piezas
     }));
   };
 
-  
-
   const agregarTrabajo = async () => {
-    // Verificar si todos los campos obligatorios están llenos
     if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas <= 0) {
       alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
       return;
     }
   
-    try {
-      // Calcular el precio automáticamente multiplicando el número de horas por $350 y sumar el precio de las piezas
-      const costoPorHoras = newJob.horas * 350;
-      const costoPiezas = newJob.piezas.reduce((total, pieza) => total + pieza.precio, 0);
-      const costoTotal = costoPorHoras + costoPiezas;
+    let costoTotal = 0;
   
+    switch (newJob.tipo_de_trabajo) {
+      case "Reparación mecánica":
+        costoTotal = (newJob.horas * 350 + newJob.costoPieza) * 1.1;
+        break;
+      case "Reparación de chapa y pintura":
+        costoTotal = (newJob.horas * 350 + newJob.costoPieza) * 1.3;
+        break;
+      case "Revisión":
+        costoTotal = 450;
+        break;
+      default:
+        costoTotal = newJob.horas * 350;
+        break;
+    }
+  
+    try {
       if (selectedJob) {
         await axios.put(`http://localhost:4001/api/trabajos/${selectedJob.id_trabajo}`, { ...newJob, costo: costoTotal });
         const updatedJobs = jobs.map(job => {
@@ -148,7 +159,6 @@ const ConsultarTrabajos = () => {
     }
   };
   
-
   return (
     <div className="container">
       <Header />
@@ -156,62 +166,62 @@ const ConsultarTrabajos = () => {
       <h2>Consultar y actualizar trabajos</h2>
       <button onClick={() => setModalIsOpen(true)}>Agregar Trabajo</button>
       <Modal
-  isOpen={modalIsOpen}
-  onRequestClose={closeModal}
-  contentLabel={selectedJob ? "Actualizar Trabajo" : "Agregar Trabajo"}
-  className="modal"
-  overlayClassName="overlay"
->
-  <h2>{selectedJob ? 'Actualizar Trabajo' : 'Agregar Trabajo'}</h2>
-  <form>
-    <div className="input-group">
-      <label htmlFor="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" onChange={handleInputChange} value={newJob.nombre} />
-    </div>
-    <div className="input-group">
-      <label htmlFor="descripcion">Descripción:</label>
-      <input type="text" id="descripcion" name="descripcion" onChange={handleInputChange} value={newJob.descripcion} />
-    </div>
-    <div className="input-group">
-      <label htmlFor="tipo_de_trabajo">Tipo de Trabajo:</label>
-      <select
-        id="tipo_de_trabajo"
-        name="tipo_de_trabajo"
-        onChange={handleInputChange}
-        value={newJob.tipo_de_trabajo || ''}
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel={selectedJob ? "Actualizar Trabajo" : "Agregar Trabajo"}
+        className="modal"
+        overlayClassName="overlay"
       >
-        <option value="">Seleccionar Tipo</option>
-        <option value="Reparación">Reparación</option>
-        <option value="Revisión">Revisión</option>
-      </select>
-    </div>
-    <div className="input-group">
-      <label htmlFor="horas">Horas:</label>
-      <input type="number" id="horas" name="horas" onChange={handleInputChange} value={newJob.horas} />
-    </div>
-    <div className="input-group">
-      <label htmlFor="estado">Estado:</label>
-      <input type="text" id="estado" name="estado" onChange={handleInputChange} value={newJob.estado} />
-    </div>
-    <div className="input-group">
-      <label htmlFor="piezas">Piezas:</label>
-      <select
-        id="piezas"
-        name="piezas"
-        onChange={handlePiezasChange}
-        multiple
-      >
-        {piezasDisponibles.map(pieza => (
-          <option key={pieza.id_pieza} value={pieza.id_pieza} data-precio={pieza.precio}>{pieza.nombre}</option>
-        ))}
-      </select>
-    </div>
-    <div className="button-group">
-      <button type="button" onClick={agregarTrabajo}>{selectedJob ? 'Actualizar' : 'Agregar'}</button>
-      <button type="button" onClick={closeModal}>Cancelar</button>
-    </div>
-  </form>
-</Modal>
+        <h2>{selectedJob ? 'Actualizar Trabajo' : 'Agregar Trabajo'}</h2>
+        <form>
+          <div className="input-group">
+            <label htmlFor="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" onChange={handleInputChange} value={newJob.nombre} />
+          </div>
+          <div className="input-group">
+            <label htmlFor="descripcion">Descripción:</label>
+            <input type="text" id="descripcion" name="descripcion" onChange={handleInputChange} value={newJob.descripcion} />
+          </div>
+          <div className="input-group">
+            <label htmlFor="tipo_de_trabajo">Tipo de Trabajo:</label>
+            <select
+              id="tipo_de_trabajo"
+              name="tipo_de_trabajo"
+              onChange={handleInputChange}
+              value={newJob.tipo_de_trabajo || ''}
+            >
+              <option value="">Seleccionar Tipo</option>
+              <option value="Reparación">Reparación</option>
+              <option value="Revisión">Revisión</option>
+            </select>
+          </div>
+          <div className="input-group">
+            <label htmlFor="horas">Horas:</label>
+            <input type="number" id="horas" name="horas" onChange={handleInputChange} value={newJob.horas} />
+          </div>
+          <div className="input-group">
+            <label htmlFor="estado">Estado:</label>
+            <input type="text" id="estado" name="estado" onChange={handleInputChange} value={newJob.estado} />
+          </div>
+          <div className="input-group">
+            <label htmlFor="piezas">Piezas:</label>
+            <select
+              id="piezas"
+              name="piezas"
+              onChange={handlePiezasChange}
+              multiple
+            >
+              {piezasDisponibles.map(pieza => (
+                <option key={pieza.id_pieza} value={pieza.id_pieza} data-precio={pieza.precio}>{pieza.nombre}</option>
+              ))}
+            </select>
+          </div>
+          <div className="button-group">
+            <button type="button" onClick={agregarTrabajo}>{selectedJob ? 'Actualizar' : 'Agregar'}</button>
+            <button type="button" onClick={closeModal}>Cancelar</button>
+          </div>
+        </form>
+      </Modal>
 
       <table>
         <thead>
