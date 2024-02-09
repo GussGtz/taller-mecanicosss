@@ -1,4 +1,3 @@
-
 const connection = require("../database");
 
 // Obtener todos los mecánicos
@@ -33,11 +32,11 @@ const obtenerMecanicoPorId = (req, res) => {
 
 // Crear un nuevo mecánico
 const crearMecanico = (req, res) => {
-  const { nombre, especialidad } = req.body;
+  const { nombre, especialidad, usuario, contrasena, rol } = req.body;
 
-  const sql = "INSERT INTO mecanico (nombre, especialidad) VALUES (?, ?)";
+  const sql = "INSERT INTO mecanico (nombre, especialidad, usuario, contrasena, rol) VALUES (?, ?, ?, ?, ?)";
 
-  connection.query(sql, [nombre, especialidad], (error, results) => {
+  connection.query(sql, [nombre, especialidad, usuario, contrasena, rol], (error, results) => {
     if (error) {
       res.status(500).json({ error: "Error al agregar nuevo mecánico" });
     } else {
@@ -49,11 +48,11 @@ const crearMecanico = (req, res) => {
 // Actualizar información de un mecánico por ID
 const actualizarMecanicoPorId = (req, res) => {
   const id = req.params.id_mecanico;
-  const { nombre, especialidad } = req.body;
+  const { nombre, especialidad, usuario, contrasena, rol } = req.body;
 
-  const sql = "UPDATE mecanico SET nombre = ?, especialidad = ? WHERE id_mecanico = ?";
+  const sql = "UPDATE mecanico SET nombre = ?, especialidad = ?, usuario = ?, contrasena = ?, rol = ? WHERE id_mecanico = ?";
 
-  connection.query(sql, [nombre, especialidad, id], (error, results) => {
+  connection.query(sql, [nombre, especialidad, usuario, contrasena, rol, id], (error, results) => {
     if (error) {
       res.status(500).json({ error: "Error al actualizar mecánico por ID" });
     } else {
@@ -65,7 +64,6 @@ const actualizarMecanicoPorId = (req, res) => {
 // Eliminar un mecánico por ID
 const eliminarMecanicoPorId = (req, res) => {
   const id = req.params.id_mecanico;
-  console.log(id);
 
   const sql = "DELETE FROM mecanico WHERE id_mecanico = ?";
 

@@ -1,239 +1,85 @@
+/* login.css */
+
 .login-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #B3C9D6; /* Color de fondo azul */
 }
 
 .login-container {
-  background-color: #8E8E8E; /* Color de fondo gris para el contenedor de login */
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 300px; /* Ajusta según tu diseño */
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo-container {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
 }
 
 .logo-container img {
-  max-width: 100px; /* Ajusta según el tamaño de tu logo */
-  height: auto;
+  max-width: 100px;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 2rem;
+.login-form {
+  display: flex;
+  flex-direction: column;
 }
 
 .input-container {
-  margin-bottom: 1rem;
-  background: #e6e6e6; /* Color de fondo para los input */
-  border-radius: 20px; /* Bordes redondeados para los input */
+  margin-bottom: 15px;
 }
 
 .input-container input {
   width: 100%;
   padding: 10px;
-  border: none;
-  background: transparent;
-  outline: none;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 button {
   width: 100%;
   padding: 10px;
+  background-color: #007bff;
   border: none;
-  border-radius: 20px;
-  margin-bottom: 1rem;
-  background-color: #004a99; /* Color de fondo del botón */
-  color: white;
-  font-weight: bold;
-}
-
-button.secondary-btn {
-  background-color: transparent;
-  color: #004a99;
-  text-decoration: underline;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  cursor: pointer;
-  opacity: 0.8;
+  background-color: #0056b3;
 }
 
 .options-container {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin: 1rem 0;
+  margin-top: 10px;
 }
 
-.options-container hr {
-  flex-grow: 1;
+hr {
+  flex: 1;
   border: none;
-  height: 1px;
-  background-color: #d4d4d4;
+  border-top: 1px solid #ccc;
 }
 
 .options-container span {
   padding: 0 10px;
 }
-.register-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #B3C9D6; /* Color de fondo azul */
-}
-
-.register-container {
-  background-color: #8E8E8E; /* Color de fondo gris para el contenedor de registro */
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 300px; /* Ajusta según tu diseño */
-}
-
-.logo-container {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.logo-container img {
-  max-width: 100px; /* Ajusta según el tamaño de tu logo */
-  height: auto;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #ffffff; /* Cambia el color según necesites */
-}
-
-.input-container {
-  margin-bottom: 1rem;
-  background: #e6e6e6; /* Color de fondo para los input */
-  border-radius: 20px; /* Bordes redondeados para los input */
-}
-
-.input-container input {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  background: transparent;
-  outline: none;
-}
-
-button.primary-btn {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
-  margin-bottom: 1rem;
-  background-color: #004a99; /* Color de fondo del botón de registro */
-  color: white;
-  font-weight: bold;
-}
-
-button.secondary-btn {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
-  margin-bottom: 1rem;
-  background-color: transparent;
-  color: #ffffff; /* Cambia el color del texto según necesites */
-  font-weight: bold;
-}
-
-button:hover {
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-.register-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #B3C9D6; /* Fondo azul claro según la imagen proporcionada */
-}
-
-.register-container {
-  background-color: #8E8E8E; /* Gris para el formulario de registro */
-  padding: 2rem;
-  border-radius: 10px; /* Esquinas ligeramente redondeadas */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 350px; /* Ancho del formulario según la imagen */
-  margin: auto;
-}
-
-.logo-container {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.logo-container img {
-  width: 100px; /* Ajusta según el tamaño de tu logo */
-  height: auto;
-  margin-bottom: 20px; /* Espacio debajo del logo */
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #FFFFFF; /* Texto blanco según la imagen */
-  font-size: 24px; /* Tamaño grande del texto */
-}
-
-.input-container {
-  margin-bottom: 1rem;
-  background: #FFFFFF; /* Fondo blanco para los input */
-  border-radius: 20px; /* Bordes redondeados para los input */
-}
-
-.input-container input {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 20px; /* Bordes redondeados para los input */
-  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
-}
-
-.primary-btn {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
-  margin-top: 1rem; /* Espacio antes del botón */
-  margin-bottom: 0.5rem; /* Espacio después del botón */
-  background-color: #004a99; /* Fondo azul oscuro para el botón de registro */
-  color: white;
-  font-weight: bold;
-  font-size: 16px; /* Tamaño del texto */
-}
 
 .secondary-btn {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
-  background-color: transparent;
-  color: white;
-  font-weight: bold;
   text-align: center;
-  display: block; /* Asegura que el enlace ocupe todo el ancho */
-  text-decoration: none; /* Remueve la subrayado del enlace */
-  margin-top: 0.5rem; /* Espacio después del enlace */
-  font-size: 16px; /* Tamaño del texto */
+  margin-top: 10px;
+  text-decoration: none;
+  color: #007bff;
 }
 
 .secondary-btn:hover {
-  text-decoration: underline; /* Subraya el enlace al pasar el cursor */
+  color: #0056b3;
 }
-
-/* Asegúrate de que tus estilos no estén siendo sobrescritos por otros archivos CSS */
-

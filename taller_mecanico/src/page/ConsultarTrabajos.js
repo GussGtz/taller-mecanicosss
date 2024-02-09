@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import Header from '../components/Header';
 import '../css/consultartrabajos.css';
-
+import '../css/Modals.css'
 
 Modal.setAppElement('#root');
 
@@ -19,7 +19,7 @@ const ConsultarTrabajos = () => {
     nombre: '',
     descripcion: '',
     tipo_de_trabajo: '',
-    estado: 'Inactivo',
+    estado: 'En proceso',
     horas: 0,
     costoPiezas: 0, // Nuevo campo para el costo de las piezas
     // Otros campos según tu modelo de datos
@@ -60,22 +60,8 @@ const ConsultarTrabajos = () => {
   };
 
   const handleUpdate = (job) => {
-    // Validar que los campos no estén en blanco
-    if (!job.nombre || !job.descripcion || !job.tipo_de_trabajo || job.horas <= 0) {
-      alert("No se puede actualizar un trabajo con campos vacíos. Asegúrese de completar todos los campos.");
-      return;
-    }
-  
-    // Verificar si se ha realizado algún cambio
-    const cambiosRealizados =
-      newJob.nombre !== job.nombre ||
-      newJob.descripcion !== job.descripcion ||
-      newJob.tipo_de_trabajo !== job.tipo_de_trabajo ||
-      newJob.horas !== job.horas ||
-      newJob.costoPiezas !== job.costoPiezas;
-  
-    if (!cambiosRealizados) {
-      alert("No se han realizado cambios. Por favor, realice algún cambio antes de actualizar.");
+    if (!job.nombre || !job.descripcion || !job.tipo_de_trabajo || job.horas <= 0 || typeof job.costoPiezas === 'undefined') {
+      alert("No se puede actualizar un trabajo con campos vacíos o sin costo de piezas. Asegúrese de completar todos los campos.");
       return;
     }
   
@@ -119,7 +105,6 @@ const ConsultarTrabajos = () => {
     const { name, value } = e.target;
     setNewJob(prevState => ({ ...prevState, [name]: value }));
   };
-
   const agregarTrabajo = async () => {
     if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas <= 0) {
       alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
@@ -132,44 +117,44 @@ const ConsultarTrabajos = () => {
       return;
     }
   
+    let costoTotal = 0;
+  
+    switch (newJob.tipo_de_trabajo) {
+      case "Reparación mecánica":
+        costoTotal = (newJob.horas * 350) * 1.1 + parseFloat(newJob.costoPiezas);
+        break;
+      case "Reparación de chapa y pintura":
+        costoTotal = (newJob.horas * 350) * 1.3 + parseFloat(newJob.costoPiezas);
+        break;
+      case "Revisión":
+        costoTotal = 450;
+        break;
+      default:
+        break;
+    }
+  
+    console.log("Costo total antes de enviar la solicitud:", costoTotal);
+  
     try {
-      // Aquí asumimos que el ID del mecánico es 1, puedes ajustarlo según tus necesidades.
-      const idMecanico = 1;
-  
-      // Asociamos el ID del mecánico al nuevo trabajo
-      const trabajoConIdMecanico = {
-        ...newJob,
-        id_mecanico: idMecanico,
-      };
-  
-      let costoTotal = 0;
-  
-      switch (trabajoConIdMecanico.tipo_de_trabajo) {
-        case "Reparación mecánica":
-          costoTotal = (trabajoConIdMecanico.horas * 350) * 1.1 + parseFloat(trabajoConIdMecanico.costoPiezas);
-          break;
-        case "Reparación de chapa y pintura":
-          costoTotal = (trabajoConIdMecanico.horas * 350) * 1.3 + parseFloat(trabajoConIdMecanico.costoPiezas);
-          break;
-        case "Revisión":
-          costoTotal = 450;
-          break;
-        default:
-          break;
+      if (selectedJob) {
+        await axios.put(`http://localhost:4001/api/trabajos/${selectedJob.id_trabajo}`, { ...newJob, costo: costoTotal });
+        const updatedJobs = jobs.map(job => {
+          if (job.id_trabajo === selectedJob.id_trabajo) {
+            return { ...newJob, costo: costoTotal };
+          }
+          return job;
+        });
+        setJobs(updatedJobs);
+      } else {
+        const response = await axios.post('http://localhost:4001/api/trabajos', { ...newJob, costo: costoTotal });
+        setJobs([...jobs, { ...response.data, costo: costoTotal }]);
       }
-  
-      console.log("Costo total antes de enviar la solicitud:", costoTotal);
-  
-      const response = await axios.post('http://localhost:4001/api/trabajos', { ...trabajoConIdMecanico, costo: costoTotal });
-      setJobs([...jobs, { ...response.data, costo: costoTotal }]);
   
       closeModal();
     } catch (error) {
-      console.error('Error adding job:', error);
+      console.error('Error adding/updating job:', error);
     }
   };
-  
-  
   
   
   return (
@@ -246,5 +231,6 @@ const ConsultarTrabajos = () => {
     </div>
   );
 };
+
 
 export default ConsultarTrabajos;
