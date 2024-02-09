@@ -65,10 +65,16 @@ const ConsultarTrabajos = () => {
       return;
     }
   
+    if (job.estado === 'Terminado') {
+      alert("No se puede actualizar un trabajo que ya está terminado.");
+      return;
+    }
+  
     setSelectedJob(job);
     setNewJob(job);
     setModalIsOpen(true);
   };
+  
   
 
   const handleDelete = async (id) => {
@@ -199,9 +205,18 @@ const ConsultarTrabajos = () => {
             <input type="number" id="horas" name="horas" onChange={handleInputChange} value={newJob.horas} />
           </div>
           <div className="input-group">
-            <label htmlFor="estado">Estado:</label>
-            <input type="text" id="estado" name="estado" onChange={handleInputChange} value={newJob.estado} />
-          </div>
+  <label htmlFor="estado">Estado:</label>
+  <select
+    id="estado"
+    name="estado"
+    onChange={handleInputChange}
+    value={newJob.estado || ''}
+  >
+    <option value="">Seleccionar Estado</option>
+    <option value="En Proceso">En Proceso</option>
+    <option value="Terminado">Terminado</option>
+  </select>
+</div>
           <div className="input-group">
             <label htmlFor="costoPiezas">Costo de las Piezas:</label>
             <input type="number" id="costoPiezas" name="costoPiezas" onChange={handleInputChange} value={newJob.costoPiezas} />
