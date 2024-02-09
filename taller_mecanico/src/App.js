@@ -11,6 +11,7 @@ import Trabajos from './page/Trabajos';
 import ActualizarTrabajo from './page/ActualizarTrabajo';
 import ACTrabajos from './page/ACTrabajos';
 import Piezas from './page/Piezas'; // Importa el componente ConsultarPiezas
+import MecanicosCrud from './page/MecanicosCrud';
 
 const App = () => {
   const handleLogin = (userData) => {
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/trabajos" element={<Trabajos />} />
           <Route path="/ActualizarTrabajo" element={<ActualizarTrabajo />} />
           <Route path="/ACTrabajos" element={<ACTrabajos />} />
+          <Route path="/MecanicosCrud" element={<MecanicosCrud />} />
         </Routes>
       </div>
     </Router>

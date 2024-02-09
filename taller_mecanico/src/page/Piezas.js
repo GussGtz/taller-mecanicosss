@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import Header from '../components/Header';
+
 // import '../css/consultarpiezas.css'; // Asegúrate de importar el archivo CSS correspondiente
 
 Modal.setAppElement('#root');

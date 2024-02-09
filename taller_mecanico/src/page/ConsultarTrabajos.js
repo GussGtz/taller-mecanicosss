@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import Header from '../components/Header';
 import '../css/consultartrabajos.css';
 
+
 Modal.setAppElement('#root');
 
 const ConsultarTrabajos = () => {
@@ -44,7 +45,7 @@ const ConsultarTrabajos = () => {
         <td>{job.horas}</td>
         <td>{job.estado}</td>
         <td>{job.tipo_de_trabajo}</td>
-        <td>{job.horas * 350}</td>
+        <td>{job.costo}</td>
         <td>
           <button onClick={() => handleDetails(job)}>Detalles</button>
           <button onClick={() => handleUpdate(job)}>Actualizar</button>
@@ -59,10 +60,30 @@ const ConsultarTrabajos = () => {
   };
 
   const handleUpdate = (job) => {
+    // Validar que los campos no estén en blanco
+    if (!job.nombre || !job.descripcion || !job.tipo_de_trabajo || job.horas <= 0) {
+      alert("No se puede actualizar un trabajo con campos vacíos. Asegúrese de completar todos los campos.");
+      return;
+    }
+  
+    // Verificar si se ha realizado algún cambio
+    const cambiosRealizados =
+      newJob.nombre !== job.nombre ||
+      newJob.descripcion !== job.descripcion ||
+      newJob.tipo_de_trabajo !== job.tipo_de_trabajo ||
+      newJob.horas !== job.horas ||
+      newJob.costoPiezas !== job.costoPiezas;
+  
+    if (!cambiosRealizados) {
+      alert("No se han realizado cambios. Por favor, realice algún cambio antes de actualizar.");
+      return;
+    }
+  
     setSelectedJob(job);
     setNewJob(job);
     setModalIsOpen(true);
   };
+  
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("¿Estás seguro de eliminar este trabajo?");
@@ -99,62 +120,57 @@ const ConsultarTrabajos = () => {
     setNewJob(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const handlePiezasChange = (e) => {
-    const selectedPiezas = Array.from(e.target.selectedOptions, option => ({
-      id_pieza: option.value,
-      precio: parseFloat(option.dataset.precio),
-    }));
-    const costoPiezaTotal = selectedPiezas.reduce((total, pieza) => total + pieza.precio, 0);
-    setNewJob(prevState => ({
-      ...prevState,
-      piezas: selectedPiezas.map(pieza => pieza.id_pieza),
-      costoPieza: costoPiezaTotal, // Actualiza el costo total de las piezas
-    }));
-  };
-
   const agregarTrabajo = async () => {
     if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas <= 0) {
       alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
       return;
     }
   
-    let costoTotal = 0;
-  
-    switch (newJob.tipo_de_trabajo) {
-      case "Reparación mecánica":
-        costoTotal = (newJob.horas * 350 + newJob.costoPieza) * 1.1;
-        break;
-      case "Reparación de chapa y pintura":
-        costoTotal = (newJob.horas * 350 + newJob.costoPieza) * 1.3;
-        break;
-      case "Revisión":
-        costoTotal = 450;
-        break;
-      default:
-        costoTotal = newJob.horas * 350;
-        break;
+    const specialCharsRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    if (specialCharsRegex.test(newJob.nombre) || specialCharsRegex.test(newJob.descripcion) || specialCharsRegex.test(newJob.estado)) {
+      alert("No se permiten caracteres especiales en el nombre, descripción o estado.");
+      return;
     }
   
     try {
-      if (selectedJob) {
-        await axios.put(`http://localhost:4001/api/trabajos/${selectedJob.id_trabajo}`, { ...newJob, costo: costoTotal });
-        const updatedJobs = jobs.map(job => {
-          if (job.id_trabajo === selectedJob.id_trabajo) {
-            return { ...newJob, costo: costoTotal };
-          }
-          return job;
-        });
-        setJobs(updatedJobs);
-      } else {
-        const response = await axios.post('http://localhost:4001/api/trabajos', { ...newJob, costo: costoTotal });
-        setJobs([...jobs, { ...response.data, costo: costoTotal }]);
+      // Aquí asumimos que el ID del mecánico es 1, puedes ajustarlo según tus necesidades.
+      const idMecanico = 1;
+  
+      // Asociamos el ID del mecánico al nuevo trabajo
+      const trabajoConIdMecanico = {
+        ...newJob,
+        id_mecanico: idMecanico,
+      };
+  
+      let costoTotal = 0;
+  
+      switch (trabajoConIdMecanico.tipo_de_trabajo) {
+        case "Reparación mecánica":
+          costoTotal = (trabajoConIdMecanico.horas * 350) * 1.1 + parseFloat(trabajoConIdMecanico.costoPiezas);
+          break;
+        case "Reparación de chapa y pintura":
+          costoTotal = (trabajoConIdMecanico.horas * 350) * 1.3 + parseFloat(trabajoConIdMecanico.costoPiezas);
+          break;
+        case "Revisión":
+          costoTotal = 450;
+          break;
+        default:
+          break;
       }
+  
+      console.log("Costo total antes de enviar la solicitud:", costoTotal);
+  
+      const response = await axios.post('http://localhost:4001/api/trabajos', { ...trabajoConIdMecanico, costo: costoTotal });
+      setJobs([...jobs, { ...response.data, costo: costoTotal }]);
   
       closeModal();
     } catch (error) {
-      console.error('Error adding/updating job:', error);
+      console.error('Error adding job:', error);
     }
   };
+  
+  
+  
   
   return (
     <div className="container">
@@ -180,18 +196,19 @@ const ConsultarTrabajos = () => {
             <input type="text" id="descripcion" name="descripcion" onChange={handleInputChange} value={newJob.descripcion} />
           </div>
           <div className="input-group">
-            <label htmlFor="tipo_de_trabajo">Tipo de Trabajo:</label>
-            <select
-              id="tipo_de_trabajo"
-              name="tipo_de_trabajo"
-              onChange={handleInputChange}
-              value={newJob.tipo_de_trabajo || ''}
-            >
-              <option value="">Seleccionar Tipo</option>
-              <option value="Reparación">Reparación</option>
-              <option value="Revisión">Revisión</option>
-            </select>
-          </div>
+  <label htmlFor="tipo_de_trabajo">Tipo de Trabajo:</label>
+  <select
+    id="tipo_de_trabajo"
+    name="tipo_de_trabajo"
+    onChange={handleInputChange}
+    value={newJob.tipo_de_trabajo || ''}
+  >
+    <option value="">Seleccionar Tipo</option>
+    <option value="Reparación mecánica">Reparación mecánica</option>
+    <option value="Reparación de chapa y pintura">Reparación de chapa y pintura</option>
+    <option value="Revisión">Revisión</option>
+  </select>
+</div>
           <div className="input-group">
             <label htmlFor="horas">Horas:</label>
             <input type="number" id="horas" name="horas" onChange={handleInputChange} value={newJob.horas} />
