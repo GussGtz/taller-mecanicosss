@@ -1,7 +1,10 @@
 const nodemailer = require('nodemailer');
 
-enviarMail = async() => {
-
+enviarMail = async(request, response) => {
+    const {destinatario, asunto, cuerpo} = request.body
+    console.log(destinatario);
+    console.log(asunto);
+    console.log(cuerpo);
     const config = {
         host: 'smtp.gmail.com',
         port: 587,
@@ -12,9 +15,9 @@ enviarMail = async() => {
     }
     const mensaje = {
         from: 'diegoalemanmena@gmail.com',
-        to: 'diegoalemanmena@gmail.com',
-        subject: 'Correo desde la api',
-        text: 'Envio de correo desde node js utilizando nodemailer para poder probar que la api funciona'
+        to: `${destinatario}`,
+        subject: `${asunto}`,
+        text: `${cuerpo}`
     }
     const transport = nodemailer.createTransport(config);
 
@@ -22,4 +25,9 @@ enviarMail = async() => {
     console.log(info);
 }
 
-enviarMail();
+
+
+
+module.exports = {
+    enviarMail
+  };

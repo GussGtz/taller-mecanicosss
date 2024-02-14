@@ -9,15 +9,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// = request.body
 // Función para enviar un correo electrónico
-const enviarCorreo = async (destinatario, asunto, cuerpo) => {
-  try {
+const enviarCorreo = async ( ) => {
+const {destinatario, asunto, cuerpo} = request.body
+    try {
     const info = await transporter.sendMail({
       from: 'diegoalemanmena@gmail.com',
       to: destinatario,
       subject: asunto,
       text: cuerpo,
     });
+    // console.log(destinatario, asunto, cuerpo);
 
     console.log('Correo electrónico enviado:', info.response);
     return true; // Éxito al enviar el correo

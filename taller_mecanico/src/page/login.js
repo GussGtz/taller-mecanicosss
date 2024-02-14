@@ -25,6 +25,7 @@ function Login() {
         console.log(response.data.usuario.rol_id);
 
         // Guardar los datos del mecánico en localStorage
+        localStorage.setItem('id_mecanico', response.data.usuario.id_usuario);
         localStorage.setItem('mecanico', JSON.stringify(response.data.usuario));
         localStorage.setItem('rol', response.data.usuario.rol_id);
 

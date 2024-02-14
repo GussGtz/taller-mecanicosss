@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Navigate} from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 
@@ -25,13 +25,45 @@ const MecanicosCrud = () => {
       .catch(error => console.error('Error al eliminar mecánico:', error));
   };
 
+  // localStorage.setItem('mecanico', JSON.stringify(response.data.usuario));
+
+
   const editarMecanico = () => {
+    const idUsuario = localStorage.getItem('id_mecanico');
+    const idMecanico = parseInt(idUsuario);
+    console.log(idUsuario);
+    console.log(mecanicoSeleccionado.id_mecanico);
+    console.log(idMecanico);
+
+    if ( mecanicoSeleccionado.id_mecanico === idMecanico){
+
     axios.put(`http://localhost:4001/api/mecanico/${mecanicoSeleccionado.id_mecanico}`, mecanicoSeleccionado)
       .then(() => {
         obtenerMecanicos();
         setModalIsOpen(false);
       })
       .catch(error => console.error('Error al editar mecánico:', error));
+
+      // localStorage.setItem('rol', response.data.usuario.rol_id);
+      console.log(mecanicoSeleccionado.rol);
+
+      if (mecanicoSeleccionado.rol === "Mecánico general"){
+        localStorage.setItem('rol', "Mecánico general");
+        console.log(mecanicoSeleccionado.rol);
+
+        window.location.href="/home";
+        
+      }
+
+    }
+    else{
+      axios.put(`http://localhost:4001/api/mecanico/${mecanicoSeleccionado.id_mecanico}`, mecanicoSeleccionado)
+      .then(() => {
+        obtenerMecanicos();
+        setModalIsOpen(false);
+      })
+      .catch(error => console.error('Error al editar mecánico:', error));
+    }
   };
 
   const handleInputChange = (e) => {
@@ -108,7 +140,7 @@ const MecanicosCrud = () => {
           </div>
           <div className="input-group">
             <label htmlFor="contrasena">Contraseña:</label>
-            <input type="password" id="contrasena" name="contrasena" onChange={handleInputChange} value={mecanicoSeleccionado ? mecanicoSeleccionado.contrasena : ''} />
+            <input type="text" id="contrasena" name="contrasena" onChange={handleInputChange} value={mecanicoSeleccionado ? mecanicoSeleccionado.contrasena : ''} />
           </div>
           <div className="input-group">
             <label htmlFor="rol">Rol:</label>

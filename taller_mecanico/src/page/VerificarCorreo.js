@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'; // Importa useNavigate para redi
 const VerificarCorreo  = () => {
   const [destinatario, setDestinatario] = useState('');
   const [codigoVerificacion, setCodigoVerificacion] = useState('');
-  const [mostrarModal, setMostrarModal] = useState(false);
   const [codigoIngresado, setCodigoIngresado] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate(); // Instancia de useNavigate
@@ -21,15 +20,14 @@ const VerificarCorreo  = () => {
       setCodigoVerificacion(codigo); // Almacena el código generado en el estado
       console.log(destinatario);
       // Realiza una solicitud POST a la ruta de tu backend que envía correos electrónicos
-      const response = await axios.post('http://localhost:4001/api/enviar-correo', {
+      const response = await axios.post('http://localhost:4001/api/enviarMail/', {
         destinatario,
         asunto: 'Código de verificación',
         cuerpo: `Tu código de verificación es: ${codigo}`,
       });
 
-      console.log(response.data.mensaje);
       // Mostrar el modal después de enviar el correo
-      setMostrarModal(true);
+      console.log("Activnando modal");
     } catch (error) {
       console.error('Error al enviar el correo electrónico', error);
     }
@@ -52,13 +50,12 @@ const VerificarCorreo  = () => {
         <p className="text-sm text-gray-600 mb-4">Por favor, ingrese su correo electrónico a continuación. Le enviaremos un código de verificación para poder iniciar sesión correctamente.</p>
         <label className="block mb-2">
           Correo electrónico:
-          <input type="text" value={destinatario} onChange={(e) => setDestinatario(e.target.value)} className="block w-full border-gray-300 rounded-md mt-1" />
+          <input type="email" value={destinatario} onChange={(e) => setDestinatario(e.target.value)} className="block w-full border-gray-300 rounded-md mt-1" />
         </label>
         <button onClick={handleEnvioCorreo} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Enviar código de verificación</button>
       </div>
       
       {/* Modal */}
-      {mostrarModal && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-8 rounded-lg">
             <h2 className="text-lg mb-4">Ingrese el código de verificación</h2>
@@ -67,7 +64,6 @@ const VerificarCorreo  = () => {
             <button onClick={handleSubmitCodigo} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Aceptar</button>
           </div>
         </div>
-      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ const trabajoRouter = require("./Router/trabajoRouter");
 const piezasRouter = require("./Router/piezaRouter");
 const mecanicosRouter = require("./Router/mecanicosRouter");
 const loginRouter = require("./Router/loginRouter"); // Importa el enrutador de autenticación desde el archivo adecuado
+const enviarMail = require("./Router/enviarMailRouter"); // Importa el enrutador de autenticación desde el archivo adecuado
 
 const correoRouter = require("./Router/correoRouter");
 // const emailRouter = require("./Router/emailRouter"); // Importa el enrutador de correo electrónico
@@ -19,6 +20,7 @@ app.use("/api/piezas", piezasRouter);
 app.use("/api/mecanico", mecanicosRouter);
 app.use("/api", loginRouter); // Usa el enrutador de autenticación
 app.use("/api/correo", correoRouter);
+app.use("/api/enviarMail", enviarMail);
 
 
 // app.use("/api/email", emailRouter); // Usa el enrutador de correo electrónico
