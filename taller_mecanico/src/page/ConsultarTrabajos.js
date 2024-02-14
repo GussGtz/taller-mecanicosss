@@ -27,12 +27,13 @@ const ConsultarTrabajos = () => {
   
   const navigate = useNavigate();
 
+
   useEffect(() => {
     // Obtener los trabajos al cargar el componente
     axios.get('http://localhost:4001/api/trabajos')
       .then(response => setJobs(response.data))
       .catch(error => console.error('Error fetching jobs:', error));
-  }, []);
+  }, [jobs]); // <-- Agrega jobs como dependencia
 
   const displayJobs = () => {
     const sortedJobs = jobs.slice().sort((a, b) => a.id_trabajo - b.id_trabajo);
@@ -69,7 +70,7 @@ const ConsultarTrabajos = () => {
       alert("No se puede actualizar un trabajo que ya está terminado.");
       return;
     }
-  
+
     setSelectedJob(job);
     setNewJob(job);
     setModalIsOpen(true);
@@ -79,7 +80,9 @@ const ConsultarTrabajos = () => {
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("¿Estás seguro de eliminar este trabajo?");
-    if (!confirmDelete) return;
+    if (!confirmDelete) 
+    
+    return;
 
     try {
       await axios.delete(`http://localhost:4001/api/trabajos/${id}`);
@@ -167,7 +170,6 @@ const ConsultarTrabajos = () => {
     <div className="container">
       <Header />
       <h1>Consultar y actualizar trabajos</h1>
-      <h2>Consultar y actualizar trabajos</h2>
       <button onClick={() => setModalIsOpen(true)}>Agregar Trabajo</button>
       <Modal
         isOpen={modalIsOpen}

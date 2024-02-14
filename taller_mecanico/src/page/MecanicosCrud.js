@@ -1,6 +1,8 @@
 import React, { useState, useEffect, Navigate} from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
+import HeaderAdmin from '../components/HeaderAdmin';
+import "../css/MecanicosCrud.css"; 
 
 Modal.setAppElement('#root');
 
@@ -8,6 +10,16 @@ const MecanicosCrud = () => {
   const [mecanicos, setMecanicos] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [mecanicoSeleccionado, setMecanicoSeleccionado] = useState(null);
+  const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
+  const [nuevoMecanico, setNuevoMecanico] = useState({
+    nombre: '',
+    especialidad: '',
+    usuario: '',
+    contrasena: '',
+    rol: '',
+  });
+  
+
 
   useEffect(() => {
     obtenerMecanicos();
@@ -19,9 +31,35 @@ const MecanicosCrud = () => {
       .catch(error => console.error('Error al obtener mecánicos:', error));
   };
 
+  const validarCaracteresEspeciales = (texto) => {
+    // Expresión regular para buscar caracteres especiales: < > / { } ( )
+    const caracteresEspeciales = /[<>/{()}]/;
+    return caracteresEspeciales.test(texto);
+  };
+
+
+
+  
+  const handleNuevoMecanicoChange = (e) => {
+    const { name, value } = e.target;
+    if (!validarCaracteresEspeciales(value)) {
+      setNuevoMecanico((prevMecanico) => ({
+        ...prevMecanico,
+        [name]: value,
+        
+      }));
+    } else {
+      alert("El campo contiene caracteres especiales no permitidos.");
+    }
+  };
+  
+
   const eliminarMecanico = (idMecanico) => {
     axios.delete(`http://localhost:4001/api/mecanico/${idMecanico}`)
-      .then(() => obtenerMecanicos())
+      .then(() => {
+        obtenerMecanicos();
+        alert("Mecánico eliminado correctamente");
+      })
       .catch(error => console.error('Error al eliminar mecánico:', error));
   };
 
@@ -37,10 +75,11 @@ const MecanicosCrud = () => {
 
     if ( mecanicoSeleccionado.id_mecanico === idMecanico){
 
-    axios.put(`http://localhost:4001/api/mecanico/${mecanicoSeleccionado.id_mecanico}`, mecanicoSeleccionado)
+      axios.put(`http://localhost:4001/api/mecanico/${mecanicoSeleccionado.id_mecanico}`, mecanicoSeleccionado)
       .then(() => {
         obtenerMecanicos();
         setModalIsOpen(false);
+        alert("Mecánico actualizado correctamente");
       })
       .catch(error => console.error('Error al editar mecánico:', error));
 
@@ -61,6 +100,8 @@ const MecanicosCrud = () => {
       .then(() => {
         obtenerMecanicos();
         setModalIsOpen(false);
+        alert("Mecánico actualizado correctamente");
+
       })
       .catch(error => console.error('Error al editar mecánico:', error));
     }
@@ -74,6 +115,45 @@ const MecanicosCrud = () => {
     }));
   };
 
+  
+
+  const agregarMecanico = () => {
+    // Verificar si algún campo está vacío
+    if (
+      nuevoMecanico.nombre.trim() === '' ||
+      nuevoMecanico.especialidad.trim() === '' ||
+      nuevoMecanico.usuario.trim() === '' ||
+      nuevoMecanico.contrasena.trim() === '' ||
+      nuevoMecanico.rol.trim() === ''
+    ) {
+      alert('Por favor, complete todos los campos.');
+      return;
+    }
+  
+    axios.post('http://localhost:4001/api/mecanico', nuevoMecanico)
+      .then((response) => {
+        console.log(response.data.message);
+        // Limpiar el formulario después de agregar un nuevo mecánico
+        setNuevoMecanico({
+          nombre: '',
+          especialidad: '',
+          usuario: '',
+          contrasena: '',
+          rol: '',
+        });
+        // Cerrar el modal después de agregar un nuevo mecánico
+        setModalAgregarAbierto(false);
+        // Actualizar la lista de mecánicos
+        obtenerMecanicos();
+        alert("Mecánico agregado correctamente");
+      })
+      .catch((error) => {
+        console.error('Error al agregar nuevo mecánico:', error);
+      });
+  };
+   
+  
+
   const abrirModalEdicion = (mecanico) => {
     setMecanicoSeleccionado(mecanico);
     setModalIsOpen(true);
@@ -83,9 +163,22 @@ const MecanicosCrud = () => {
     setModalIsOpen(false);
   };
 
+  const abrirModalAgregar = () => {
+  setModalAgregarAbierto(true);
+};
+
+
+
+
+
   return (
+    <>
+<HeaderAdmin/>
     <div className="container">
       <h1>Consultar y actualizar mecánicos</h1>
+
+      <button onClick={abrirModalAgregar}>Agregar Mecánico</button>
+
 
       <table>
         <thead>
@@ -155,7 +248,50 @@ const MecanicosCrud = () => {
           </div>
         </form>
       </Modal>
+
+      <Modal
+  isOpen={modalAgregarAbierto}
+  onRequestClose={closeModal}
+  contentLabel="Agregar Mecánico"
+  className="modal"
+  overlayClassName="overlay"
+>
+  <h2>Agregar Mecánico</h2>
+  <form>
+    <div className="input-group">
+      <label htmlFor="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" value={nuevoMecanico.nombre} onChange={handleNuevoMecanicoChange} />
     </div>
+    <div className="input-group">
+      <label htmlFor="especialidad">Especialidad:</label>
+      <input type="text" id="especialidad" name="especialidad" value={nuevoMecanico.especialidad} onChange={handleNuevoMecanicoChange} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="usuario">Usuario:</label>
+      <input type="text" id="usuario" name="usuario" value={nuevoMecanico.usuario} onChange={handleNuevoMecanicoChange} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="contrasena">Contraseña:</label>
+      <input type="text" id="contrasena" name="contrasena" value={nuevoMecanico.contrasena} onChange={handleNuevoMecanicoChange} />
+    </div>
+    <div className="input-group">
+      <label htmlFor="rol">Rol:</label>
+      <select id="rol" name="rol" value={nuevoMecanico.rol} onChange={handleNuevoMecanicoChange}>
+      <option value="">Seleccionar Rol</option>
+        <option value="Mecánico general">Mecánico general</option>
+        <option value="Mecánico administrador">Mecánico administrador</option>
+      </select>
+    </div>
+    <div className="button-group">
+      <button type="button" onClick={agregarMecanico}>Guardar</button>
+      <button type="button" onClick={() => setModalAgregarAbierto(false)}>Cancelar</button>
+    </div>
+  </form>
+</Modal>
+
+
+    </div>
+    </>
   );
 };
 

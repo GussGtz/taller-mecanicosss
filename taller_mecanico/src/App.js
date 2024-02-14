@@ -43,7 +43,7 @@ const App = () => {
           <Route path="/ACTrabajos" element={<AuthChecker element={<ACTrabajos />} />} />
           {/* <Route path="/MecanicosCrud" element={<AuthChecker element={<MecanicosCrud />} />} /> */}
           <Route path="/MecanicosCrud" element={<AdminAuthChecker element={<MecanicosCrud />} />} />
-          <Route path="/VerificarCorreo" element={<VerificarCorreo />} />
+          <Route path="/VerificarCorreo" element={<AuthChecker element={<VerificarCorreo />} />} />
         </Routes>
       </div>
     </Router>

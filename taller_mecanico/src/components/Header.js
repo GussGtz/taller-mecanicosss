@@ -25,7 +25,7 @@ const Header = () => {
       </Link>
       <div className="header-buttons">
         <Link to="/ConsultarTrabajos" className="header-button">Consultar trabajo</Link>
-        <Link to="/Piezas" className="header-button">Piezas</Link>
+        {/* <Link to="/Piezas" className="header-button">Piezas</Link> */}
         <Link to="/Home" className="header-button">Home</Link>
       </div>
       <button onClick={handleProfileClick} className="header-profile-btn">

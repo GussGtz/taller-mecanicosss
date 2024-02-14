@@ -31,8 +31,8 @@ function Login() {
 
 
         if (response.data.usuario.rol_id === 'Mecánico general') {
-          console.log('Redirigiendo a /Home');
-          window.location.href = '/Home';
+          console.log('Redirigiendo a /VerificarCorreo');
+          window.location.href = '/VerificarCorreo';
         } else if (response.data.usuario.rol_id === 'Mecánico administrador') {
           console.log('Redirigiendo a /MecanicosCrud');
           window.location.href = '/MecanicosCrud';
