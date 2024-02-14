@@ -12,6 +12,10 @@ import ActualizarTrabajo from './page/ActualizarTrabajo';
 import ACTrabajos from './page/ACTrabajos';
 import Piezas from './page/Piezas'; // Importa el componente ConsultarPiezas
 import MecanicosCrud from './page/MecanicosCrud';
+import AuthChecker from './privateRoutes'; 
+import AdminAuthChecker from './AdminAuthChecker';
+import VerificarCorreo from './page/VerificarCorreo';
+
 
 const App = () => {
   const handleLogin = (userData) => {
@@ -27,17 +31,19 @@ const App = () => {
       <div className="app-container">
         <Routes>
           <Route exact path="/" element={<Login onLogin={handleLogin} />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/register" element={<Register onRegister={handleRegister} />} />
-          <Route path="/job-form" element={<JobForm />} />
-          <Route path="/consultartrabajos" element={<ConsultarTrabajos />} />
-          <Route path="/Piezas" element={<Piezas />} /> {/* Agrega la ruta para ConsultarPiezas */}
-          <Route path="/detalles/:id" element={<Detalles />} />
-          <Route path="/seguimiento" element={<Seguimiento />} />
-          <Route path="/trabajos" element={<Trabajos />} />
-          <Route path="/ActualizarTrabajo" element={<ActualizarTrabajo />} />
-          <Route path="/ACTrabajos" element={<ACTrabajos />} />
-          <Route path="/MecanicosCrud" element={<MecanicosCrud />} />
+          <Route path="/home" element={<AuthChecker element={<Home />} />} />
+          <Route path="/register" element={<AuthChecker element={<Register />} />} />
+          <Route path="/job-form" element={<AuthChecker element={<JobForm />} />} />
+          <Route path="/consultartrabajos" element={<AuthChecker element={<ConsultarTrabajos />} />} />
+          <Route path="/Piezas" element={<AuthChecker element={<Piezas />} />} />
+          <Route path="/detalles/:id" element={<AuthChecker element={<Detalles />} />} />
+          <Route path="/seguimiento" element={<AuthChecker element={<Seguimiento />} />} />
+          <Route path="/trabajos" element={<AuthChecker element={<Trabajos />} />} />
+          <Route path="/ActualizarTrabajo" element={<AuthChecker element={<ActualizarTrabajo />} />} />
+          <Route path="/ACTrabajos" element={<AuthChecker element={<ACTrabajos />} />} />
+          {/* <Route path="/MecanicosCrud" element={<AuthChecker element={<MecanicosCrud />} />} /> */}
+          <Route path="/MecanicosCrud" element={<AdminAuthChecker element={<MecanicosCrud />} />} />
+          <Route path="/VerificarCorreo" element={<VerificarCorreo />} />
         </Routes>
       </div>
     </Router>

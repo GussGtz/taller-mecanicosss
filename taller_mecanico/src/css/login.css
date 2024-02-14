@@ -1,85 +1,87 @@
-/* login.css */
+/* Estilos para el formulario de inicio de sesión */
 
-.login-wrapper {
+.flex {
   display: flex;
-  justify-content: center;
-  align-items: center;
+}
+
+.h-screen {
   height: 100vh;
 }
 
-.login-container {
-  width: 300px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.w-screen {
+  width: 100vw;
 }
 
-.logo-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.logo-container img {
-  max-width: 100px;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.input-container {
-  margin-bottom: 15px;
-}
-
-.input-container input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.options-container {
-  display: flex;
-  justify-content: space-between;
+.items-center {
   align-items: center;
-  margin-top: 10px;
 }
 
-hr {
-  flex: 1;
-  border: none;
-  border-top: 1px solid #ccc;
+.justify-center {
+  justify-content: center;
 }
 
-.options-container span {
-  padding: 0 10px;
+.bg-white {
+  background-color: #fff;
 }
 
-.secondary-btn {
+.p-8 {
+  padding: 2rem;
+}
+
+.max-w-md {
+  max-width: 28rem; /* Ajusta este valor según sea necesario */
+}
+
+.border-2 {
+  border-width: 2px;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-center {
   text-align: center;
-  margin-top: 10px;
-  text-decoration: none;
-  color: #007bff;
 }
 
-.secondary-btn:hover {
-  color: #0056b3;
+.mb-4 {
+  margin-bottom: 1rem;
 }
+
+.text-white {
+  color: #fff;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.border-gray {
+  border-color: #ccc;
+}
+
+.placeholder-gray {
+  color: #ccc;
+}
+
+.bg-cyan-800 {
+  background-color: #007bff;
+}
+
+/* Estilos para el botón de ingreso */
