@@ -31,7 +31,8 @@ const App = () => {
       <div className="app-container">
         <Routes>
           <Route exact path="/" element={<Login onLogin={handleLogin} />} />
-          <Route path="/home" element={<AuthChecker element={<Home />} />} />
+          {/* <Route path="/home" element={<AuthChecker element={<Home />} />} /> */}
+          <Route path="/home" element={<Home />} />
           <Route path="/register" element={<AuthChecker element={<Register />} />} />
           <Route path="/job-form" element={<AuthChecker element={<JobForm />} />} />
           <Route path="/consultartrabajos" element={<AuthChecker element={<ConsultarTrabajos />} />} />

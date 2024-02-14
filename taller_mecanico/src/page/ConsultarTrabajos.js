@@ -56,8 +56,9 @@ const ConsultarTrabajos = () => {
     ));
   };
 
+  
   const handleDetails = (job) => {
-    // Implementa la lógica para mostrar los detalles del trabajo seleccionado
+    navigate(`/detalles/${job.id_trabajo}`);
   };
 
   const handleUpdate = (job) => {
@@ -115,7 +116,7 @@ const ConsultarTrabajos = () => {
     setNewJob(prevState => ({ ...prevState, [name]: value }));
   };
   const agregarTrabajo = async () => {
-    if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas <= 0) {
+    if (!newJob.nombre || !newJob.descripcion || !newJob.tipo_de_trabajo || newJob.horas < 0) {
       alert("Todos los campos son obligatorios. Por favor, complete todos los campos.");
       return;
     }

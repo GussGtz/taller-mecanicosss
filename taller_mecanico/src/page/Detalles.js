@@ -12,6 +12,7 @@ const Detalles = () => {
     estado: '',
     tipo: '',
     costo: 0,
+    costoPiezas: 0,
     detalles: '',
   });
 
@@ -35,8 +36,8 @@ const Detalles = () => {
       <table>
         <tbody>
           <tr>
-            <th>ID:</th>
-            <td>{job.id}</td>
+            <th>Nombre:</th> {/* Cambiamos "ID" por "Nombre" */}
+            <td>{job.nombre}</td> {/* Mostramos el nombre del trabajo */}
           </tr>
           <tr>
             <th>Descripción:</th>
@@ -52,11 +53,11 @@ const Detalles = () => {
           </tr>
           <tr>
             <th>Costo del material:</th>
-            <td>$ 0.00</td>
+            <td>$ {job.costoPiezas}.00</td>
           </tr>
           <tr>
             <th>Precio total:</th>
-            <td>$ {job.horas * 350}.00</td>
+            <td>$ {job.horas * 350 + job.costoPiezas}.00</td>
           </tr>
         </tbody>
       </table>
